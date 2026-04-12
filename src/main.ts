@@ -11,4 +11,12 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
-app.mount('#app')
+// Initialize auth state before mounting
+const init = async () => {
+  const { useAuthStore } = await import('./stores/auth')
+  const authStore = useAuthStore()
+  await authStore.initializeAuth()
+  app.mount('#app')
+}
+
+init()

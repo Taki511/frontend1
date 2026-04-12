@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
+const router = useRouter()
+const authStore = useAuthStore()
 const isMenuOpen = ref(false)
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/')
+  isMenuOpen.value = false
+}
 </script>
 
 <template>
@@ -31,18 +41,34 @@ const isMenuOpen = ref(false)
 
         <!-- Auth Buttons -->
         <div class="hidden md:flex items-center space-x-4">
-          <router-link
-            to="/login"
-            class="px-4 py-2 text-gray-700 font-medium border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Login
-          </router-link>
-          <router-link
-            to="/register"
-            class="px-4 py-2 text-white font-medium bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors"
-          >
-            Register
-          </router-link>
+          <template v-if="authStore.isAuthenticated">
+            <router-link
+              :to="authStore.dashboardRoute"
+              class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+            >
+              Dashboard
+            </router-link>
+            <button
+              @click="handleLogout"
+              class="px-4 py-2 text-red-600 font-medium hover:bg-red-50 rounded-lg transition-colors"
+            >
+              Logout
+            </button>
+          </template>
+          <template v-else>
+            <router-link
+              to="/login"
+              class="px-4 py-2 text-gray-700 font-medium border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Login
+            </router-link>
+            <router-link
+              to="/register"
+              class="px-4 py-2 text-white font-medium bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors"
+            >
+              Register
+            </router-link>
+          </template>
         </div>
 
         <!-- Mobile Menu Button -->
@@ -96,22 +122,40 @@ const isMenuOpen = ref(false)
         >
           Contact
         </router-link>
-        <div class="pt-4 space-y-2">
+        
+        <template v-if="authStore.isAuthenticated">
           <router-link
-            to="/login"
-            class="block w-full px-3 py-2 text-center text-gray-700 font-medium border border-gray-300 rounded-lg"
+            :to="authStore.dashboardRoute"
+            class="block px-3 py-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-md"
             @click="isMenuOpen = false"
           >
-            Login
+            Dashboard
           </router-link>
-          <router-link
-            to="/register"
-            class="block w-full px-3 py-2 text-center text-white font-medium bg-primary-500 rounded-lg"
-            @click="isMenuOpen = false"
+          <button
+            @click="handleLogout"
+            class="block w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-md"
           >
-            Register
-          </router-link>
-        </div>
+            Logout
+          </button>
+        </template>
+        <template v-else>
+          <div class="pt-4 space-y-2">
+            <router-link
+              to="/login"
+              class="block w-full px-3 py-2 text-center text-gray-700 font-medium border border-gray-300 rounded-lg"
+              @click="isMenuOpen = false"
+            >
+              Login
+            </router-link>
+            <router-link
+              to="/register"
+              class="block w-full px-3 py-2 text-center text-white font-medium bg-primary-500 rounded-lg"
+              @click="isMenuOpen = false"
+            >
+              Register
+            </router-link>
+          </div>
+        </template>
       </div>
     </div>
   </nav>
