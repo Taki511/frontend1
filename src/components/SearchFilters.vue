@@ -38,7 +38,7 @@ const fetchSkills = async () => {
 
 const handleSearch = () => {
   const query: Record<string, string> = {}
-  if (searchQuery.value) query.search = searchQuery.value
+  if (searchQuery.value.trim()) query.q = searchQuery.value.trim()
   if (selectedWilaya.value) query.wilaya = selectedWilaya.value
   if (selectedSkill.value) query.skill = selectedSkill.value
   if (selectedType.value) query.type = selectedType.value
@@ -49,6 +49,13 @@ const handleSearch = () => {
   })
 }
 
+const clearFilters = () => {
+  searchQuery.value = ''
+  selectedWilaya.value = ''
+  selectedSkill.value = ''
+  selectedType.value = ''
+}
+
 onMounted(() => {
   fetchSkills()
 })
@@ -56,27 +63,34 @@ onMounted(() => {
 
 <template>
   <section class="py-8 -mt-8">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="bg-white rounded-xl shadow-lg p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
           <!-- Search Input -->
-          <div class="relative">
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search internships..."
-              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-              @keyup.enter="handleSearch"
-            />
+          <div class="md:col-span-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <div class="relative">
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search internships..."
+                class="w-full px-4 py-3 pl-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                @keyup.enter="handleSearch"
+              />
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
           </div>
 
           <!-- Location Dropdown -->
-          <div>
+          <div class="md:col-span-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
             <select
               v-model="selectedWilaya"
-              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white appearance-none cursor-pointer"
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white cursor-pointer"
             >
-              <option value="">Location (Wilaya)</option>
+              <option value="">All Locations</option>
               <option v-for="wilaya in wilayas" :key="wilaya" :value="wilaya">
                 {{ wilaya }}
               </option>
@@ -84,12 +98,13 @@ onMounted(() => {
           </div>
 
           <!-- Skills Dropdown -->
-          <div>
+          <div class="md:col-span-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Skills</label>
             <select
               v-model="selectedSkill"
-              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white appearance-none cursor-pointer"
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white cursor-pointer"
             >
-              <option value="">Tech Skills</option>
+              <option value="">All Skills</option>
               <option v-for="skill in skills" :key="skill" :value="skill">
                 {{ skill }}
               </option>
@@ -97,12 +112,13 @@ onMounted(() => {
           </div>
 
           <!-- Type Dropdown -->
-          <div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
             <select
               v-model="selectedType"
-              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white appearance-none cursor-pointer"
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white cursor-pointer"
             >
-              <option value="">Type</option>
+              <option value="">All Types</option>
               <option v-for="type in types" :key="type.value" :value="type.value">
                 {{ type.label }}
               </option>
@@ -110,13 +126,22 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Search Button (Mobile) -->
-        <div class="mt-4 md:hidden">
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 mt-6 pt-4 border-t border-gray-100">
           <button
             @click="handleSearch"
-            class="w-full py-3 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
+            class="flex-1 sm:flex-none sm:px-8 py-3 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors flex items-center justify-center gap-2"
           >
-            Search
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Search Internships
+          </button>
+          <button
+            @click="clearFilters"
+            class="flex-1 sm:flex-none sm:px-6 py-3 text-gray-600 font-medium border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Clear Filters
           </button>
         </div>
       </div>
