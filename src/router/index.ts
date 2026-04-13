@@ -29,6 +29,11 @@ const router = createRouter({
       name: 'browse-offers',
       component: () => import('../views/BrowseOffersView.vue'),
     },
+    {
+      path: '/contact',
+      name: 'contact',
+      component: () => import('../views/ContactView.vue'),
+    },
     // Dashboard placeholders - will be implemented later
     {
       path: '/student/dashboard',
