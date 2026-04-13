@@ -79,9 +79,24 @@ const router = createRouter({
     },
     {
       path: '/admin/dashboard',
-      name: 'admin-dashboard',
       component: () => import('../views/dashboards/AdminDashboard.vue'),
       meta: { requiresAuth: true, role: 'admin' },
+      children: [
+        {
+          path: '',
+          redirect: '/admin/dashboard/applications',
+        },
+        {
+          path: 'applications',
+          name: 'admin-applications',
+          component: () => import('../views/dashboards/admin/Applications.vue'),
+        },
+        {
+          path: 'agreements',
+          name: 'admin-agreements',
+          component: () => import('../views/dashboards/admin/Agreements.vue'),
+        },
+      ],
     },
   ],
 })
