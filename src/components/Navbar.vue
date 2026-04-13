@@ -21,7 +21,7 @@ const handleLogout = async () => {
         <!-- Logo -->
         <div class="flex items-center">
           <router-link to="/" class="flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full bg-primary-500"></div>
+            <img src="/logo.png" alt="Stage.io" class="h-8 w-auto" />
             <span class="text-xl font-bold text-gray-900">Stage.io</span>
           </router-link>
         </div>

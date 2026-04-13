@@ -81,7 +81,12 @@ const filteredApplications = computed(() => {
   }
 
   if (statusFilter.value !== 'all') {
-    filtered = filtered.filter(app => normalizeStatus(app.status) === statusFilter.value)
+    if (statusFilter.value === 'refused') {
+      // Show both refused and cancelled under the Refused tab
+      filtered = filtered.filter(app => ['refused', 'cancelled'].includes(normalizeStatus(app.status)))
+    } else {
+      filtered = filtered.filter(app => normalizeStatus(app.status) === statusFilter.value)
+    }
   }
 
   return filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -91,7 +96,7 @@ const counts = computed(() => ({
   all: applications.value.length,
   pending: applications.value.filter(a => normalizeStatus(a.status) === 'pending').length,
   accepted: applications.value.filter(a => normalizeStatus(a.status) === 'accepted').length,
-  refused: applications.value.filter(a => normalizeStatus(a.status) === 'refused').length,
+  refused: applications.value.filter(a => ['refused', 'cancelled'].includes(normalizeStatus(a.status))).length,
 }))
 
 // Actions
@@ -309,6 +314,15 @@ onMounted(async () => {
                   Applied {{ formatDate(application.created_at) }}
                 </span>
                 <span
+                  v-if="application.accepted_at"
+                  class="inline-flex items-center gap-1 px-2 py-1 bg-green-50 rounded-md border border-green-100"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Accepted {{ formatDate(application.accepted_at) }}
+                </span>
+                <span
                   v-if="application.student_cv?.academic_level"
                   class="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-md border border-gray-100"
                 >
@@ -409,6 +423,10 @@ onMounted(async () => {
                 <div>
                   <span class="text-gray-500">Status</span>
                   <p class="font-medium text-gray-900 capitalize">{{ selectedApplication.status }}</p>
+                </div>
+                <div v-if="selectedApplication.accepted_at">
+                  <span class="text-gray-500">Accepted At</span>
+                  <p class="font-medium text-gray-900">{{ formatDateTime(selectedApplication.accepted_at) }}</p>
                 </div>
               </div>
             </div>

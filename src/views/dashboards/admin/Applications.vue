@@ -217,6 +217,15 @@ onMounted(() => {
                   </svg>
                   Confirmed {{ formatDate(application.confirmed_at) }}
                 </span>
+                <span
+                  v-if="application.accepted_at"
+                  class="inline-flex items-center gap-1 px-2 py-1 bg-green-50 rounded-md border border-green-100"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Accepted {{ formatDate(application.accepted_at) }}
+                </span>
                 <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-md border border-gray-100">
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -299,6 +308,10 @@ onMounted(() => {
                 <div>
                   <span class="text-gray-500">Applied on</span>
                   <p class="font-medium text-gray-900">{{ formatDateTime(selectedApplication.created_at) }}</p>
+                </div>
+                <div v-if="selectedApplication.accepted_at">
+                  <span class="text-gray-500">Accepted At</span>
+                  <p class="font-medium text-gray-900">{{ formatDateTime(selectedApplication.accepted_at) }}</p>
                 </div>
                 <div>
                   <span class="text-gray-500">Confirmed At</span>
