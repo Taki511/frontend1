@@ -24,6 +24,11 @@ const router = createRouter({
       component: RegisterView,
       meta: { guest: true },
     },
+    {
+      path: '/offers',
+      name: 'browse-offers',
+      component: () => import('../views/BrowseOffersView.vue'),
+    },
     // Dashboard placeholders - will be implemented later
     {
       path: '/student/dashboard',

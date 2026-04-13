@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue'
 import Navbar from '../components/Navbar.vue'
 import HeroSection from '../components/HeroSection.vue'
-import SearchFilters from '../components/SearchFilters.vue'
 import FeaturedInternships from '../components/FeaturedInternships.vue'
 import WhySection from '../components/WhySection.vue'
 import StatsSection from '../components/StatsSection.vue'
@@ -45,7 +44,6 @@ onMounted(() => {
   <div class="min-h-screen bg-white">
     <Navbar />
     <HeroSection />
-    <SearchFilters />
     <FeaturedInternships :offers="featuredOffers" />
     <WhySection />
     <StatsSection :total-offers="stats.total_offers" />
