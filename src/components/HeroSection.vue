@@ -7,7 +7,7 @@
         Find Your Perfect Internship in Algeria
       </h1>
       <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-        Connect talented students with tech opportunities across North Africa
+        Connect talented students with tech opportunities across Algeria
       </p>
     </div>
   </section>

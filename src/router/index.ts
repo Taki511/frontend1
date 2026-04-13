@@ -27,9 +27,24 @@ const router = createRouter({
     // Dashboard placeholders - will be implemented later
     {
       path: '/student/dashboard',
-      name: 'student-dashboard',
       component: () => import('../views/dashboards/StudentDashboard.vue'),
       meta: { requiresAuth: true, role: 'student' },
+      children: [
+        {
+          path: '',
+          redirect: '/student/dashboard/my-cv',
+        },
+        {
+          path: 'my-cv',
+          name: 'student-my-cv',
+          component: () => import('../views/dashboards/student/MyCV.vue'),
+        },
+        {
+          path: 'my-applications',
+          name: 'student-my-applications',
+          component: () => import('../views/dashboards/student/MyApplications.vue'),
+        },
+      ],
     },
     {
       path: '/recruiter/dashboard',
