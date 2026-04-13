@@ -65,6 +65,13 @@ const fetchApplications = async () => {
   }
 }
 
+// Normalize status (backend may return 'rejected' or 'refused')
+const normalizeStatus = (status: string) => {
+  const s = (status || '').toLowerCase()
+  if (s === 'rejected') return 'refused'
+  return s
+}
+
 // Filtered applications
 const filteredApplications = computed(() => {
   let filtered = applications.value
@@ -74,7 +81,7 @@ const filteredApplications = computed(() => {
   }
 
   if (statusFilter.value !== 'all') {
-    filtered = filtered.filter(app => app.status.toLowerCase() === statusFilter.value)
+    filtered = filtered.filter(app => normalizeStatus(app.status) === statusFilter.value)
   }
 
   return filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -82,9 +89,9 @@ const filteredApplications = computed(() => {
 
 const counts = computed(() => ({
   all: applications.value.length,
-  pending: applications.value.filter(a => a.status.toLowerCase() === 'pending').length,
-  accepted: applications.value.filter(a => a.status.toLowerCase() === 'accepted').length,
-  refused: applications.value.filter(a => a.status.toLowerCase() === 'refused').length,
+  pending: applications.value.filter(a => normalizeStatus(a.status) === 'pending').length,
+  accepted: applications.value.filter(a => normalizeStatus(a.status) === 'accepted').length,
+  refused: applications.value.filter(a => normalizeStatus(a.status) === 'refused').length,
 }))
 
 // Actions
@@ -161,7 +168,7 @@ const formatDateTime = (dateString: string) => {
 }
 
 const getStatusClasses = (status: string) => {
-  const s = status.toLowerCase()
+  const s = normalizeStatus(status)
   if (s === 'pending') return 'bg-amber-100 text-amber-800 border-amber-200'
   if (s === 'accepted') return 'bg-green-100 text-green-800 border-green-200'
   if (s === 'refused') return 'bg-red-100 text-red-800 border-red-200'
@@ -326,7 +333,7 @@ onMounted(async () => {
                 </svg>
                 View
               </button>
-              <template v-if="application.status.toLowerCase() === 'pending'">
+              <template v-if="normalizeStatus(application.status) === 'pending'">
                 <button
                   @click="refuseApplication(application.id)"
                   class="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
@@ -505,7 +512,7 @@ onMounted(async () => {
           </div>
 
           <!-- Modal Footer -->
-          <div v-if="selectedApplication.status.toLowerCase() === 'pending'" class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+          <div v-if="normalizeStatus(selectedApplication.status) === 'pending'" class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
             <button
               @click="refuseApplication(selectedApplication.id)"
               class="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50"
