@@ -33,9 +33,34 @@ const router = createRouter({
     },
     {
       path: '/recruiter/dashboard',
-      name: 'recruiter-dashboard',
       component: () => import('../views/dashboards/RecruiterDashboard.vue'),
       meta: { requiresAuth: true, role: 'recruiter' },
+      children: [
+        {
+          path: '',
+          redirect: '/recruiter/dashboard/my-offers',
+        },
+        {
+          path: 'my-offers',
+          name: 'recruiter-my-offers',
+          component: () => import('../views/dashboards/recruiter/MyOffers.vue'),
+        },
+        {
+          path: 'applications',
+          name: 'recruiter-applications',
+          component: () => import('../views/dashboards/recruiter/Applications.vue'),
+        },
+        {
+          path: 'company-profile',
+          name: 'recruiter-company-profile',
+          component: () => import('../views/dashboards/recruiter/CompanyProfile.vue'),
+        },
+        {
+          path: 'my-profile',
+          name: 'recruiter-my-profile',
+          component: () => import('../views/dashboards/recruiter/MyProfile.vue'),
+        },
+      ],
     },
     {
       path: '/admin/dashboard',
