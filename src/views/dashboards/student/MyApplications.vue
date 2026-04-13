@@ -95,6 +95,9 @@ const confirmApplication = async (applicationId: number) => {
     }
 
     success.value = data.message || 'Application confirmed successfully!'
+    if (data.other_applications_cancelled && data.other_applications_cancelled > 0) {
+      success.value += ` ${data.other_applications_cancelled} other application(s) were cancelled.`
+    }
     await fetchApplications()
     if (selectedApplication.value?.id === applicationId) {
       closeDetailModal()
