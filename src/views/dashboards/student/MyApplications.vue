@@ -50,6 +50,7 @@ const fetchApplications = async () => {
 const normalizeStatus = (status: string, isConfirmed?: boolean | number | string) => {
   const s = (status || '').toLowerCase()
   if (s === 'rejected') return 'refused'
+  if (s === 'validated') return 'validated'
   const confirmed = isConfirmed === true || isConfirmed === 1 || isConfirmed === 'true' || isConfirmed === '1'
   if (s === 'accepted' && confirmed) return 'confirmed'
   return s
@@ -71,6 +72,7 @@ const counts = computed(() => ({
   pending: applications.value.filter(a => normalizeStatus(a.status, a.is_confirmed) === 'pending').length,
   accepted: applications.value.filter(a => normalizeStatus(a.status, a.is_confirmed) === 'accepted').length,
   confirmed: applications.value.filter(a => normalizeStatus(a.status, a.is_confirmed) === 'confirmed').length,
+  validated: applications.value.filter(a => normalizeStatus(a.status, a.is_confirmed) === 'validated').length,
   refused: applications.value.filter(a => normalizeStatus(a.status, a.is_confirmed) === 'refused').length,
   cancelled: applications.value.filter(a => normalizeStatus(a.status, a.is_confirmed) === 'cancelled').length,
 }))
@@ -169,6 +171,7 @@ const getStatusClasses = (status: string, isConfirmed?: boolean | number | strin
   if (s === 'pending') return 'bg-amber-100 text-amber-800 border-amber-200'
   if (s === 'accepted') return 'bg-green-100 text-green-800 border-green-200'
   if (s === 'confirmed') return 'bg-blue-100 text-blue-800 border-blue-200'
+  if (s === 'validated') return 'bg-purple-100 text-purple-800 border-purple-200'
   if (s === 'refused') return 'bg-red-100 text-red-800 border-red-200'
   if (s === 'cancelled') return 'bg-gray-100 text-gray-800 border-gray-200'
   return 'bg-gray-100 text-gray-800 border-gray-200'
@@ -214,6 +217,7 @@ onMounted(() => {
             { key: 'pending', label: 'Pending' },
             { key: 'accepted', label: 'Accepted' },
             { key: 'confirmed', label: 'Confirmed' },
+            { key: 'validated', label: 'Validated' },
             { key: 'refused', label: 'Refused' },
             { key: 'cancelled', label: 'Cancelled' },
             { key: 'all', label: 'All' },
