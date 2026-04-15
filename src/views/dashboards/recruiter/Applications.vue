@@ -14,7 +14,7 @@ const success = ref('')
 
 // Filters
 const selectedOffer = ref<number | 'all'>('all')
-const statusFilter = ref<'all' | 'pending' | 'accepted' | 'refused'>('pending')
+const statusFilter = ref<'all' | 'pending' | 'accepted' | 'refused' | 'cancelled'>('pending')
 
 // Modal
 const selectedApplication = ref<any>(null)
@@ -81,12 +81,7 @@ const filteredApplications = computed(() => {
   }
 
   if (statusFilter.value !== 'all') {
-    if (statusFilter.value === 'refused') {
-      // Show both refused and cancelled under the Refused tab
-      filtered = filtered.filter(app => ['refused', 'cancelled'].includes(normalizeStatus(app.status)))
-    } else {
-      filtered = filtered.filter(app => normalizeStatus(app.status) === statusFilter.value)
-    }
+    filtered = filtered.filter(app => normalizeStatus(app.status) === statusFilter.value)
   }
 
   return filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -96,7 +91,8 @@ const counts = computed(() => ({
   all: applications.value.length,
   pending: applications.value.filter(a => normalizeStatus(a.status) === 'pending').length,
   accepted: applications.value.filter(a => normalizeStatus(a.status) === 'accepted').length,
-  refused: applications.value.filter(a => ['refused', 'cancelled'].includes(normalizeStatus(a.status))).length,
+  refused: applications.value.filter(a => normalizeStatus(a.status) === 'refused').length,
+  cancelled: applications.value.filter(a => normalizeStatus(a.status) === 'cancelled').length,
 }))
 
 // Actions
@@ -177,6 +173,7 @@ const getStatusClasses = (status: string) => {
   if (s === 'pending') return 'bg-amber-100 text-amber-800 border-amber-200'
   if (s === 'accepted') return 'bg-green-100 text-green-800 border-green-200'
   if (s === 'refused') return 'bg-red-100 text-red-800 border-red-200'
+  if (s === 'cancelled') return 'bg-gray-100 text-gray-800 border-gray-200'
   return 'bg-gray-100 text-gray-800 border-gray-200'
 }
 
@@ -214,6 +211,7 @@ onMounted(async () => {
               { key: 'pending', label: 'Pending' },
               { key: 'accepted', label: 'Accepted' },
               { key: 'refused', label: 'Refused' },
+              { key: 'cancelled', label: 'Cancelled' },
               { key: 'all', label: 'All' },
             ]"
             :key="tab.key"
