@@ -50,13 +50,22 @@ const handleLogout = async () => {
 
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center space-x-8">
-          <router-link to="/" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">
+          <router-link
+            to="/"
+            class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+          >
             Home
           </router-link>
-          <router-link to="/offers" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">
+          <router-link
+            to="/offers"
+            class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+          >
             Browse Offers
           </router-link>
-          <router-link to="/contact" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">
+          <router-link
+            to="/contact"
+            class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+          >
             Contact
           </router-link>
         </div>
@@ -68,14 +77,30 @@ const handleLogout = async () => {
             :title="isInverted ? 'Normal colors' : 'Inverted colors'"
             class="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <svg v-if="!isInverted" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 012.646 2.646M21 12a9 9 0 01-9 9m0 0a9 9 0 01-9-9m9 9c4.418 0 8.268-2.783 9.812-6.647M9.172 9.172L21 21m-12-12l-8.485-8.485" />
+            <svg
+              v-if="!isInverted"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20.354 15.354A9 9 0 012.646 2.646M21 12a9 9 0 01-9 9m0 0a9 9 0 01-9-9m9 9c4.418 0 8.268-2.783 9.812-6.647M9.172 9.172L21 21m-12-12l-8.485-8.485"
+              />
             </svg>
             <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
             </svg>
           </button>
-          
+
           <template v-if="authStore.isAuthenticated">
             <router-link
               :to="authStore.dashboardRoute"
@@ -140,15 +165,31 @@ const handleLogout = async () => {
           @click="toggleInvert"
           class="w-full text-left px-3 py-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-md flex items-center gap-2"
         >
-          <svg v-if="!isInverted" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 012.646 2.646M21 12a9 9 0 01-9 9m0 0a9 9 0 01-9-9m9 9c4.418 0 8.268-2.783 9.812-6.647M9.172 9.172L21 21m-12-12l-8.485-8.485" />
+          <svg
+            v-if="!isInverted"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20.354 15.354A9 9 0 012.646 2.646M21 12a9 9 0 01-9 9m0 0a9 9 0 01-9-9m9 9c4.418 0 8.268-2.783 9.812-6.647M9.172 9.172L21 21m-12-12l-8.485-8.485"
+            />
           </svg>
           <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
           </svg>
           {{ isInverted ? 'Normal Colors' : 'Inverted Colors' }}
         </button>
-        
+
         <router-link
           to="/"
           class="block px-3 py-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-md"
@@ -170,7 +211,7 @@ const handleLogout = async () => {
         >
           Contact
         </router-link>
-        
+
         <template v-if="authStore.isAuthenticated">
           <router-link
             :to="authStore.dashboardRoute"
