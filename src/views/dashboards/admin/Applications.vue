@@ -1,45 +1,98 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useAuthStore } from '../../../stores/auth'
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api'
 const authStore = useAuthStore()
 
 // State
-const applications = ref<any[]>([])
+const pendingApplications = ref<any[]>([])
+const validatedApplications = ref<any[]>([])
+const rejectedApplications = ref<any[]>([])
 const loading = ref(false)
 const error = ref('')
 const success = ref('')
 const universityDomain = ref('')
 
+// Filters
+const statusFilter = ref<'pending' | 'validated' | 'rejected'>('pending')
+
 // Modal
 const selectedApplication = ref<any>(null)
 const showDetailModal = ref(false)
 
-// Fetch pending validations
+// Filtered applications
+const filteredApplications = computed(() => {
+  if (statusFilter.value === 'pending') return pendingApplications.value
+  if (statusFilter.value === 'validated') return validatedApplications.value
+  if (statusFilter.value === 'rejected') return rejectedApplications.value
+  return []
+})
+
+const counts = computed(() => ({
+  pending: pendingApplications.value.length,
+  validated: validatedApplications.value.length,
+  rejected: rejectedApplications.value.length,
+}))
+
+const getStatusClasses = (status: string) => {
+  const s = normalizeStatus(status)
+  if (s === 'pending') return 'bg-blue-100 text-blue-800 border-blue-200'
+  if (s === 'validated') return 'bg-purple-100 text-purple-800 border-purple-200'
+  if (s === 'rejected') return 'bg-red-100 text-red-800 border-red-200'
+  return 'bg-gray-100 text-gray-800 border-gray-200'
+}
+
+const getStatusLabel = (status: string) => {
+  const s = normalizeStatus(status)
+  if (s === 'pending') return 'Pending'
+  if (s === 'validated') return 'Validated'
+  if (s === 'rejected') return 'Rejected'
+  return status
+}
+
+const canValidate = (status: string) => normalizeStatus(status) === 'pending'
+const canReject = (status: string) => normalizeStatus(status) === 'pending'
+
+const normalizeStatus = (status: string) => {
+  const s = (status || '').toLowerCase()
+  if (s === 'rejected' || s === 'refused') return 'rejected'
+  if (s === 'validated') return 'validated'
+  // 'accepted' with is_confirmed=true is treated as 'pending' (pending validation)
+  if (s === 'accepted') return 'pending'
+  return s
+}
+
+// Fetch all applications
 const fetchApplications = async () => {
   loading.value = true
   error.value = ''
   success.value = ''
 
   try {
-    const response = await fetch(`${API_BASE_URL}/admin/pending-validations`, {
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-    })
+    const [pendingRes, validatedRes, rejectedRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/admin/pending-validations`, {
+        headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${authStore.token}` },
+      }),
+      fetch(`${API_BASE_URL}/admin/validated-applications`, {
+        headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${authStore.token}` },
+      }),
+      fetch(`${API_BASE_URL}/admin/rejected-applications`, {
+        headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${authStore.token}` },
+      }),
+    ])
 
-    const data = await response.json()
+    const pendingData = pendingRes.ok ? await pendingRes.json() : { data: [] }
+    const validatedData = validatedRes.ok ? await validatedRes.json() : { data: [] }
+    const rejectedData = rejectedRes.ok ? await rejectedRes.json() : { data: [] }
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to load pending validations')
-    }
+    pendingApplications.value = (pendingData.data || []).sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    validatedApplications.value = (validatedData.data || []).sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    rejectedApplications.value = (rejectedData.data || []).sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-    applications.value = data.data || []
-    universityDomain.value = data.university_domain || ''
+    universityDomain.value = pendingData.university_domain || validatedData.university_domain || rejectedData.university_domain || ''
   } catch (err: any) {
-    error.value = err.message || 'Failed to load pending validations'
+    error.value = err.message || 'Failed to load applications'
   } finally {
     loading.value = false
   }
@@ -160,6 +213,37 @@ onMounted(() => {
       {{ success }}
     </div>
 
+    <!-- Filters -->
+    <div class="bg-white border border-gray-200 rounded-xl p-4 mb-6">
+      <div class="flex flex-wrap gap-2">
+        <button
+          v-for="tab in [
+            { key: 'pending', label: 'Pending' },
+            { key: 'validated', label: 'Validated' },
+            { key: 'rejected', label: 'Rejected' },
+          ]"
+          :key="tab.key"
+          @click="statusFilter = tab.key as any"
+          :class="[
+            'px-4 py-2 text-sm font-medium rounded-lg border transition-colors',
+            statusFilter === tab.key
+              ? 'bg-green-600 text-white border-green-600'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
+          ]"
+        >
+          {{ tab.label }}
+          <span
+            :class="[
+              'ml-1.5 px-1.5 py-0.5 text-xs rounded-md',
+              statusFilter === tab.key ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600',
+            ]"
+          >
+            {{ counts[tab.key as keyof typeof counts] }}
+          </span>
+        </button>
+      </div>
+    </div>
+
     <!-- Loading -->
     <div v-if="loading" class="flex justify-center py-12">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
@@ -167,7 +251,7 @@ onMounted(() => {
 
     <!-- Empty State -->
     <div
-      v-else-if="applications.length === 0"
+      v-else-if="filteredApplications.length === 0"
       class="text-center py-12 bg-white rounded-xl border border-gray-200"
     >
       <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -175,14 +259,16 @@ onMounted(() => {
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       </div>
-      <h3 class="text-lg font-semibold text-gray-900 mb-1">No pending validations</h3>
-      <p class="text-gray-500">There are no confirmed applications waiting for your validation.</p>
+      <h3 class="text-lg font-semibold text-gray-900 mb-1">No applications found</h3>
+      <p class="text-gray-500">
+        {{ (pendingApplications.length === 0 && validatedApplications.length === 0 && rejectedApplications.length === 0) ? "There are no applications in your university." : "No applications match your current filter." }}
+      </p>
     </div>
 
     <!-- Applications List -->
     <div v-else class="space-y-4">
       <div
-        v-for="application in applications"
+        v-for="application in filteredApplications"
         :key="application.id"
         class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
       >
@@ -194,8 +280,13 @@ onMounted(() => {
                 <h3 class="text-base font-semibold text-gray-900">
                   {{ application.student?.name || `${application.student?.first_name} ${application.student?.last_name}` }}
                 </h3>
-                <span class="px-2 py-0.5 text-xs font-medium rounded-full border bg-blue-100 text-blue-800 border-blue-200">
-                  Confirmed
+                <span
+                  :class="[
+                    'px-2 py-0.5 text-xs font-medium rounded-full border capitalize',
+                    getStatusClasses(application.status),
+                  ]"
+                >
+                  {{ getStatusLabel(application.status) }}
                 </span>
               </div>
               <p class="text-sm text-gray-500">{{ application.student?.email }}</p>
@@ -211,7 +302,10 @@ onMounted(() => {
               </div>
 
               <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-md border border-gray-100">
+                <span
+                  v-if="application.confirmed_at"
+                  class="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-md border border-gray-100"
+                >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
@@ -247,24 +341,28 @@ onMounted(() => {
                 </svg>
                 View
               </button>
-              <button
-                @click="rejectApplication(application.id)"
-                class="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Reject
-              </button>
-              <button
-                @click="validateApplication(application.id)"
-                class="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                Validate
-              </button>
+              <template v-if="canReject(application.status)">
+                <button
+                  @click="rejectApplication(application.id)"
+                  class="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Reject
+                </button>
+              </template>
+              <template v-if="canValidate(application.status)">
+                <button
+                  @click="validateApplication(application.id)"
+                  class="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Validate
+                </button>
+              </template>
             </div>
           </div>
         </div>
@@ -284,8 +382,13 @@ onMounted(() => {
               </h3>
               <p class="text-sm text-gray-500">{{ selectedApplication.student?.email }}</p>
               <div class="mt-2">
-                <span class="px-2 py-0.5 text-xs font-medium rounded-full border bg-blue-100 text-blue-800 border-blue-200">
-                  Confirmed
+                <span
+                  :class="[
+                    'px-2 py-0.5 text-xs font-medium rounded-full border capitalize',
+                    getStatusClasses(selectedApplication.status),
+                  ]"
+                >
+                  {{ getStatusLabel(selectedApplication.status) }}
                 </span>
               </div>
             </div>
@@ -379,14 +482,19 @@ onMounted(() => {
           </div>
 
           <!-- Modal Footer -->
-          <div class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+          <div
+            v-if="canReject(selectedApplication.status) || canValidate(selectedApplication.status)"
+            class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3"
+          >
             <button
+              v-if="canReject(selectedApplication.status)"
               @click="rejectApplication(selectedApplication.id)"
               class="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50"
             >
               Reject
             </button>
             <button
+              v-if="canValidate(selectedApplication.status)"
               @click="validateApplication(selectedApplication.id)"
               class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700"
             >
