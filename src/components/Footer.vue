@@ -96,7 +96,7 @@ const socialLinks = [
     <div class="border-t border-gray-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <p class="text-center text-gray-400 text-sm">
-          © 2024 Stage.io. All rights reserved. Connecting students with opportunities across Algeria.
+          © 2026 Stage.io. All rights reserved. Connecting students with opportunities across Algeria.
         </p>
       </div>
     </div>

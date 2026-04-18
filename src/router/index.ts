@@ -36,7 +36,7 @@ const router = createRouter({
       component: () => import('../views/ResetPasswordView.vue'),
       meta: { guest: true },
     },
-        {
+            {
       path: '/offers',
       name: 'browse-offers',
       component: () => import('../views/BrowseOffersView.vue'),
