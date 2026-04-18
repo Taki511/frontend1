@@ -14,7 +14,7 @@ import Footer from '../components/Footer.vue'
           <p class="mt-4 text-lg text-gray-600">Get in touch with the Stage.io team</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div class="max-w-3xl mx-auto">
           <!-- Contact Info -->
           <div class="space-y-8">
             <div class="bg-white rounded-xl border border-gray-200 p-8">
@@ -46,20 +46,6 @@ import Footer from '../components/Footer.vue'
                     <p class="text-gray-600">+213 555 789 012</p>
                   </div>
                 </div>
-
-                <div class="flex items-start gap-4">
-                  <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
-                    <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 class="text-lg font-medium text-gray-900">Address</h3>
-                    <p class="text-gray-600">123 Innovation Street</p>
-                    <p class="text-gray-600">Algiers, Algeria</p>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -84,66 +70,6 @@ import Footer from '../components/Footer.vue'
                 </a>
               </div>
             </div>
-          </div>
-
-          <!-- Contact Form -->
-          <div class="bg-white rounded-xl border border-gray-200 p-8">
-            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Send us a Message</h2>
-            <form class="space-y-6" onsubmit="event.preventDefault();">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                  <input
-                    type="text"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
-                    placeholder="John"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                  <input
-                    type="text"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
-                    placeholder="Doe"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
-                  placeholder="john@example.com"
-                />
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                <select class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all bg-white">
-                  <option>General Inquiry</option>
-                  <option>Technical Support</option>
-                  <option>Partnership</option>
-                  <option>Feedback</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                <textarea
-                  rows="5"
-                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all resize-none"
-                  placeholder="How can we help you?"
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                class="w-full px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
-              >
-                Send Message
-              </button>
-            </form>
           </div>
         </div>
       </div>
