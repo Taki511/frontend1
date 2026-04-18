@@ -63,6 +63,12 @@ const handleLogout = async () => {
             Browse Offers
           </router-link>
           <router-link
+            to="/about"
+            class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+          >
+            About Us
+          </router-link>
+          <router-link
             to="/contact"
             class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
           >
@@ -203,6 +209,13 @@ const handleLogout = async () => {
           @click="isMenuOpen = false"
         >
           Browse Offers
+        </router-link>
+        <router-link
+          to="/about"
+          class="block px-3 py-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-md"
+          @click="isMenuOpen = false"
+        >
+          About Us
         </router-link>
         <router-link
           to="/contact"
