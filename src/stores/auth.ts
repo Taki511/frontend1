@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { authService, getDashboardRoute, type User, type LoginCredentials, type RegisterData } from '../services/auth'
+import { authService, getDashboardRoute, type User, type LoginCredentials, type RegisterData, type ForgotPasswordData, type ResetPasswordData } from '../services/auth'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -96,6 +96,49 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const forgotPassword = async (email: string) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      await authService.forgotPassword({ email })
+      return { success: true }
+    } catch (err: any) {
+      error.value = err.message || 'Failed to send reset email'
+      return { success: false, error: error.value }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const resetPassword = async (data: ResetPasswordData) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      await authService.resetPassword(data)
+      return { success: true }
+    } catch (err: any) {
+      let userFriendlyMessage = err.message || 'Failed to reset password'
+      
+      // Provide more user-friendly messages for common errors
+      if (userFriendlyMessage.toLowerCase().includes('not found') || 
+          userFriendlyMessage.toLowerCase().includes('invalid') ||
+          userFriendlyMessage.toLowerCase().includes('expired')) {
+        userFriendlyMessage = 'This password reset link is invalid or has expired. Please request a new password reset.'
+      } else if (userFriendlyMessage.toLowerCase().includes('token')) {
+        userFriendlyMessage = 'Invalid reset token. Please request a new password reset link.'
+      } else if (userFriendlyMessage.toLowerCase().includes('email')) {
+        userFriendlyMessage = 'Email address not found. Please check your email and try again.'
+      }
+      
+      error.value = userFriendlyMessage
+      return { success: false, error: error.value }
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     user,
     token,
@@ -107,6 +150,8 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
+    forgotPassword,
+    resetPassword,
     initializeAuth,
     clearAuth,
   }
